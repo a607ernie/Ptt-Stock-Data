@@ -166,9 +166,9 @@ if __name__ == '__main__':
 
     # .JSON
     json_object = json.dumps(result, indent=4,ensure_ascii=False)
-    with open("ptt_stock.json", "w",encoding='utf-8') as outfile:
+    with open("./data/ptt_stock.json", "w",encoding='utf-8') as outfile:
         outfile.write(json_object)
     
     # .CSV
     df = pd.read_json(json_object).T
-    df.to_csv('ptt_stock.csv',encoding='utf-8-sig', index=False)
+    df.to_csv('./data/ptt_stock.csv',encoding='utf-8-sig', index=False)
