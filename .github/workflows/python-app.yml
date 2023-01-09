@@ -25,14 +25,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Run python file
-      run:  python main.py
+      run:  python3 main.py
     - name: Commit change
       continue-on-error: true
       run: |
         git config --global user.email "ernie60717@gmail.com"
-        git config --global user.name "${{ secrets.CI_COMMIT_AUTHOR }}"
+        git config --global user.name "a607ernie"
         git add .
-        git commit -m "Log: Update stock infomation from PTT"
+        git commit -m "Log: Update stock information from PTT"
     - name: Push change
       if: success()
       uses: ad-m/github-push-action@master
