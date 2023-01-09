@@ -9,9 +9,6 @@ on:
 
   workflow_dispatch:
 
-permissions:
-  repository-projects: write
-  
 jobs:
   build:
 
