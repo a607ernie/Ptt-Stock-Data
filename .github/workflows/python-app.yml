@@ -8,6 +8,9 @@ on:
     - cron:  '0 11 * * *'
 
   workflow_dispatch:
+
+permissions:
+  repository-projects: write
   
 jobs:
   build:
