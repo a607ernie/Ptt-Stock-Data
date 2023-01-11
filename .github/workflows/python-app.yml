@@ -26,6 +26,8 @@ jobs:
         pip install -r requirements.txt
     - name: Run python file
       run:  python3 main.py
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
     - name: Commit change
       continue-on-error: true
       run: |
@@ -38,7 +40,3 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GIT_TOKEN }}
-    - name: Slack Notification
-      uses: rtCamp/action-slack-notify@v2
-      env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
