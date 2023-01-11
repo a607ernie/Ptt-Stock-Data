@@ -7,6 +7,8 @@ import re,json,lxml
 import threading
 from queue import Queue
 import pandas as pd
+from dotenv import dotenv_values
+import datetime
 
 semaphore = threading.Semaphore(30)
 
@@ -156,7 +158,47 @@ class Stock(object):
 
 
 
-##test the file
+#############
+# slack
+#############
+dict_headers = {'Content-type': 'application/json'}
+config = dotenv_values(".env")
+
+loc_dt = datetime.datetime.today() 
+loc_dt_format = loc_dt.strftime("%Y/%m/%d %H:%M:%S")
+slack_content = {
+	"blocks": [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "*PTT STOCK* :zap: {}".format(loc_dt_format)
+			}
+		},
+		{
+			"type": "divider"
+		}
+	]
+}
+
+
+def slack_notify(data):
+    df = pd.DataFrame(data).T.reset_index()
+    filter_df = df[['STOCK_ID','TITLE','AUTHOR','LINK']]
+
+    for index, row in filter_df.iterrows():
+        slack_content['blocks'].append({'type': 'section', 'text': {'type': 'mrkdwn',"text":"\n*<{}|{}>*\n*STOCK ID* : {} \n*AUTHOR* : {}\n"\
+        .format(row['LINK'],row['TITLE'],row['STOCK_ID'],row['AUTHOR'])}})
+    
+        slack_content['blocks'].append({'type': 'divider'})
+    
+    rtn = requests.post(config['SLACK_WEBHOOK'], data=json.dumps(slack_content),headers=dict_headers)
+    print(rtn)
+
+####################
+# run code
+####################
+
 if __name__ == '__main__':
     stock = Stock()
 
@@ -172,3 +214,5 @@ if __name__ == '__main__':
     # .CSV
     df = pd.read_json(json_object).T
     df.to_csv('ptt_stock.csv',encoding='utf-8-sig', index=False)
+
+    slack_notify(result)
