@@ -8,7 +8,7 @@ import threading
 from queue import Queue
 import pandas as pd
 from dotenv import dotenv_values
-import datetime,os
+import os
 
 semaphore = threading.Semaphore(30)
 
@@ -164,15 +164,13 @@ class Stock(object):
 dict_headers = {'Content-type': 'application/json'}
 
 
-loc_dt = datetime.datetime.today() 
-loc_dt_format = loc_dt.strftime("%Y/%m/%d %H:%M:%S")
 slack_content = {
 	"blocks": [
 		{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "*PTT STOCK* :zap: {}".format(loc_dt_format)
+				"text": "*PTT STOCK* :zap:"
 			}
 		},
 		{
