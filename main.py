@@ -163,6 +163,14 @@ class Stock(object):
 #############
 dict_headers = {'Content-type': 'application/json'}
 
+# test .ENV
+# use in local 
+#config = dotenv_values(".env")
+#SLACK_WEBHOOK = config['SLACK_WEBHOOK']
+
+# prod .ENV
+# use in github or production
+SLACK_WEBHOOK = os.getenv('SLACK_WEBHOOK')
 
 slack_content = {
 	"blocks": [
@@ -190,7 +198,7 @@ def slack_notify(data):
     
         slack_content['blocks'].append({'type': 'divider'})
     
-    rtn = requests.post(os.getenv('SLACK_WEBHOOK'), data=json.dumps(slack_content),headers=dict_headers)
+    rtn = requests.post(SLACK_WEBHOOK, data=json.dumps(slack_content),headers=dict_headers)
     print(rtn)
 
 ####################
