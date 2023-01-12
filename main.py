@@ -8,8 +8,7 @@ import threading
 from queue import Queue
 import pandas as pd
 from dotenv import dotenv_values
-import datetime,os
-
+import os
 semaphore = threading.Semaphore(30)
 
 class Stock(object):
@@ -163,16 +162,22 @@ class Stock(object):
 #############
 dict_headers = {'Content-type': 'application/json'}
 
+# test .ENV
+# use in local 
+#config = dotenv_values(".env")
+#SLACK_WEBHOOK = config['SLACK_WEBHOOK']
 
-loc_dt = datetime.datetime.today() 
-loc_dt_format = loc_dt.strftime("%Y/%m/%d %H:%M:%S")
+# prod .ENV
+# use in github or production
+SLACK_WEBHOOK = os.getenv('SLACK_WEBHOOK')
+
 slack_content = {
 	"blocks": [
 		{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "*PTT STOCK* :zap: {}".format(loc_dt_format)
+				"text": "*PTT STOCK* :zap:"
 			}
 		},
 		{
@@ -192,7 +197,7 @@ def slack_notify(data):
     
         slack_content['blocks'].append({'type': 'divider'})
     
-    rtn = requests.post(os.getenv('SLACK_WEBHOOK'), data=json.dumps(slack_content),headers=dict_headers)
+    rtn = requests.post(SLACK_WEBHOOK, data=json.dumps(slack_content),headers=dict_headers)
     print(rtn)
 
 ####################
