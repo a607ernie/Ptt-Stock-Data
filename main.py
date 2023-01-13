@@ -209,7 +209,7 @@ if __name__ == '__main__':
     stock = Stock()
 
     # ptt page number
-    page_num=5
+    page_num=10
     result = stock.__main__(page_num)
 
     # .JSON
