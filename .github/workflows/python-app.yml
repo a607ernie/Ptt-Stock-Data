@@ -25,9 +25,23 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Run python file
-      run:  python3 main.py
+      run:  |
+        python3 main.py
+        mkdir output
+        cp ptt_stock.json output
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+    
+    - name: Pushes to another repository
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.GIT_TOKEN }}
+        with:
+          source-directory: 'output'
+          destination-github-username: ${{ secrets.CI_COMMIT_AUTHOR }}
+          destination-repository-name: 'jsonapi'
+          user-email: ${{ secrets.CI_COMMIT_EMAIL }}
+          target-branch: main
     - name: Commit change
       continue-on-error: true
       run: |
