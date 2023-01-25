@@ -33,7 +33,7 @@ jobs:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
     
     - name: Pushes to another repository
-        uses: cpina/github-action-push-to-another-repository@main
+        uses: cpina/github-action-push-to-another-repository@74596b72fae72d9b7b79e1b2992863c0f595c801
         env:
           API_TOKEN_GITHUB: ${{ secrets.GIT_TOKEN }}
         with:
