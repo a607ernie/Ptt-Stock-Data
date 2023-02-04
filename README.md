@@ -69,7 +69,7 @@ SLACK_WEBHOOK = config['SLACK_WEBHOOK']
 
 # run on github or server
 
-在github repo setting中，設置`SLACK_WEBHOOK`，即可透過`Slack`接收通知。
+在github repo setting中，設置`SLACK_WEBHOOK`，即可透過`Slack`接收通知
 
 ```python
 # prod .ENV
