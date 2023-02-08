@@ -28,6 +28,8 @@ jobs:
       run:  python3 main.py
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        LINE_Channel_ACCESS_TOKEN: ${{ secrets.LINE_Channel_ACCESS_TOKEN }}
+        LINE_CHANNEL_ID: ${{ secrets.LINE_CHANNEL_ID }}
     - name: Commit change
       continue-on-error: true
       run: |
