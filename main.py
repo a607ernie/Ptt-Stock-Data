@@ -9,6 +9,10 @@ from queue import Queue
 import pandas as pd
 from dotenv import dotenv_values
 import os
+from linebot import LineBotApi
+from linebot.models import TextSendMessage
+from linebot.exceptions import LineBotApiError
+
 
 semaphore = threading.Semaphore(30)
 
@@ -201,6 +205,45 @@ def slack_notify(data):
     rtn = requests.post(SLACK_WEBHOOK, data=json.dumps(slack_content),headers=dict_headers)
     print(rtn)
 
+#############
+# LINE
+#############
+# test .ENV
+# use in local 
+
+#config = dotenv_values(".env")
+#LINE_Channel_ACCESS_TOKEN = config['LINE_Channel_ACCESS_TOKEN']
+#LINE_CHANNEL_ID = config['LINE_CHANNEL_ID']
+
+# prod .ENV
+# use in github or production
+LINE_Channel_ACCESS_TOKEN = os.getenv('LINE_Channel_ACCESS_TOKEN')
+LINE_CHANNEL_ID = os.getenv('LINE_CHANNEL_ID')
+
+def line_notify(data):
+    line_bot_api = LineBotApi(LINE_Channel_ACCESS_TOKEN)
+    line_content = ''
+    df = pd.DataFrame(data).T.reset_index()
+    filter_df = df[['STOCK_ID','TITLE','AUTHOR','LINK']]
+
+    # build context
+    for index, row in filter_df.iterrows():
+        try:
+            line_content += ('文章標題:{title}  \n--作者:{author}\n'
+                                '--股票名稱:{stock_id}\n\n{link}\n\n') \
+                        .format(title=row['TITLE'], author=row['AUTHOR'],stock_id=row['STOCK_ID'],link=row['LINK'])
+        except:
+            line_content = 'something wrong!'
+            #print("something wrong!")
+    
+    # push message
+    try:
+        line_bot_api.push_message(LINE_CHANNEL_ID, TextSendMessage(text=line_content))
+    except LineBotApiError as e:
+        line_bot_api.push_message(LINE_CHANNEL_ID, TextSendMessage(text=line_content))
+        print(e)
+
+
 ####################
 # run code
 ####################
@@ -221,4 +264,5 @@ if __name__ == '__main__':
     df = pd.read_json(json_object).T
     df.to_csv('ptt_stock.csv',encoding='utf-8-sig', index=False)
 
-    slack_notify(result)
+    #slack_notify(result)
+    line_notify(result)
