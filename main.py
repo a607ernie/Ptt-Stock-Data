@@ -21,31 +21,34 @@ class Stock(object):
         self.base_url = "https://www.ptt.cc/"
         self.fetch_flag = False
         self.url = 'https://www.ptt.cc/bbs/Stock/index.html'
-        #1. get the index page & get the next page url
-        self.data, self.upURL = self.fetchpage(self.url)  # step-1
-        
-    #上一頁
-    def uppage(self,sp):
-        _uppage = self.base_url+sp.find("div",{'class':'btn-group btn-group-paging'}).find_all('a')[1]['href']
-        return _uppage
+        # Step 1: Get the index page and the next page URL
+        self.data, self.upURL = self.fetchpage(self.url)
 
-    #request to the page and return a beautifulsoup object
-    def fetchpage(self,current_page):
+    # Request the page and return a BeautifulSoup object
+    def fetchpage(self, current_page):
         data = []
-        if self.fetch_flag == True: # current_page first is a url , then always number like 5009....
-            url = 'https://www.ptt.cc//bbs/Stock/index%s.html' % current_page
+        if self.fetch_flag:  # current_page first is a URL, then always a number like 5009...
+            url = f'https://www.ptt.cc/bbs/Stock/index{current_page}.html'
             print(url)
             r = requests.get(url)
         else:
             print(current_page)
             r = requests.get(current_page)
+        
         sp = BeautifulSoup(r.text, 'lxml')
-        upURL = self.uppage(sp)
+        
+        # Extract the "上一頁" URL directly here
+        paging_div = sp.find("div", {'class': 'btn-group btn-group-paging'})
+        if paging_div:
+            upURL = paging_div.find_all('a')[1]['href']
+        else:
+            upURL = None
+        
         rent = sp.find_all('div', {'class': 'r-ent'})
         for page in rent:
             try:
                 title = page.find('div', {'class': 'title'}).a.text
-                # check the title include [標的]
+                # Check if the title includes [標的]
                 if "[標的]" in title:
                     try:
                         stock_id = re.findall(r"[0-9]{4}", title)[0]
@@ -54,25 +57,23 @@ class Stock(object):
                     pagelink = "https://www.ptt.cc" + page.find('div', {'class': 'title'}).a['href']
                     article_id = page.find('div', {'class': 'title'}).a['href'].split('/')[-1].split('.html')[0]
                     author = page.find('div', {'class': 'author'}).text
-                    if 'Re' not in title:
-                        content_tag = "標的"
-                    else:
-                        content_tag = "Re標的"
+                    content_tag = "標的" if 'Re' not in title else "Re標的"
                     temp = {
-                        'title':title,
-                        'article_id' : article_id,
+                        'title': title,
+                        'article_id': article_id,
                         'pagelink': pagelink,
                         'author': author,
-                        'content_tag':content_tag,
-                        'stock_id':stock_id
+                        'content_tag': content_tag,
+                        'stock_id': stock_id
                     }
                     data.append(temp)
             except:
                 pass
-        return data,upURL
+        
+        return data, upURL
 
-    #parse article , and build a payload
-    def parsepage(self,item):
+    # Parse an article and build a payload
+    def parsepage(self, item):
         payload = []
         r = requests.get(item['pagelink'])
         sp = BeautifulSoup(r.text, 'lxml')
@@ -81,11 +82,10 @@ class Stock(object):
         try:
             date = sp.find('span', {'class': 'article-meta-tag'}, text=re.compile('時間')).next.next.text
         except:
-            pass
-
+            date = None
 
         message = sp.find_all('div', {'class': 'push'})
-        message_all = len(sp.find_all('div', {'class': 'push'}))
+        message_all = len(message)
         push = 0
         boo = 0
         neutral = 0
@@ -119,9 +119,9 @@ class Stock(object):
         payload.append(data)
         return payload
 
-    # multi thread 
-    def parsethread(self,upURL,q):
-        # 取得旗標
+    # Multi-thread processing
+    def parsethread(self, upURL, q):
+        # Acquire semaphore
         semaphore.acquire()
         data, upURL = self.fetchpage(upURL)
         for item in data:
@@ -129,22 +129,21 @@ class Stock(object):
             q.put_nowait(payload)
         semaphore.release()
 
-
-    # class main
-    def __main__(self,page_num):
-        result=[]
+    # Class main method
+    def __main__(self, page_num):
+        result = []
         for item in self.data:
             _item = self.parsepage(item)
             result.append(_item)
 
         current_page = int(self.upURL.split('index')[1].split('.html')[0])
-        self.fetch_flag=True
+        self.fetch_flag = True
 
-        #5. mutil thread to run the for loop
+        # Multi-thread loop
         threads = []
         q = Queue()
-        for idx,page in enumerate(range(current_page,int(current_page-page_num),-1)):
-            threads.append(threading.Thread(target=self.parsethread, args=(page,q,)))
+        for idx, page in enumerate(range(current_page, int(current_page - page_num), -1)):
+            threads.append(threading.Thread(target=self.parsethread, args=(page, q,)))
             threads[idx].start()
             time.sleep(0.5)
         for i in range(len(threads)):
@@ -152,13 +151,14 @@ class Stock(object):
         for i in range(q.qsize()):
             result.append(q.get_nowait())
 
-        # process the result 
-        # change list to json format
+        # Process the result
+        # Change list to JSON format
         res = {}
         for i in range(len(result)):
             res[result[i][0]['TITLE']] = result[i][0]
-        
+
         return res
+
 
 
 
