@@ -6,8 +6,12 @@ steps:
   # Step 1: 拉取代碼
   - name: checkout
     image: alpine/git
+    insecure: true
+    environment:
+      GIT_USERNAME:
+        from_secret: git_username
     commands:
-      - git clone https://github.com/a607ernie/Ptt-Stock-Data.git
+      - git clone https://github.com/${GIT_USERNAME}/Ptt-Stock-Data.git
       - git checkout main
 
   # Step 2: 安裝依賴並執行腳本
@@ -28,6 +32,7 @@ steps:
   # Step 3: 提交更改至 GitHub
   - name: push-changes
     image: alpine/git
+    insecure: true
     environment:
       GIT_USERNAME:
         from_secret: git_username
@@ -36,8 +41,8 @@ steps:
       GIT_ACCESS_TOKEN:
         from_secret: git_access_token
     commands:
-      - git config --global user.name ${GIT_USERNAME}
-      - git config --global user.email ${GIT_EMAIL}
+      - git config --global user.name "${GIT_USERNAME}"
+      - git config --global user.email "${GIT_EMAIL}"
       - git add .
       - git commit -m "Update stock information from PTT" || echo "No changes to commit"
       - git push https://${GIT_USERNAME}:${GIT_ACCESS_TOKEN}@github.com/${GIT_USERNAME}/Ptt-Stock-Data.git main
