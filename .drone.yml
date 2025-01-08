@@ -6,9 +6,9 @@ steps:
   # Step 1: 拉取代碼
   - name: checkout
     image: alpine/git
-    # environment:
-    #   GIT_USERNAME:
-    #     from_secret: git_username
+    environment:
+      GIT_USERNAME:
+        from_secret: git_username
     secrets: [git_username]
     commands:
       - echo ${GIT_USERNAME}
@@ -29,13 +29,13 @@ steps:
   # Step 3: 提交更改至 GitHub
   - name: push-changes
     image: alpine/git
-    # environment:
-    #   GIT_USERNAME:
-    #     from_secret: git_username
-    #   GIT_EMAIL:
-    #     from_secret: git_email
-    #   GIT_ACCESS_TOKEN:
-    #     from_secret: git_access_token
+    environment:
+      GIT_USERNAME:
+        from_secret: git_username
+      GIT_EMAIL:
+        from_secret: git_email
+      GIT_ACCESS_TOKEN:
+        from_secret: git_access_token
     secrets: [git_username, git_email, git_access_token]
     commands:
       - git config --global user.name $${GIT_USERNAME}
