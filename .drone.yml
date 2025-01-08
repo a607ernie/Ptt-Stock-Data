@@ -7,7 +7,7 @@ steps:
   - name: checkout
     image: alpine/git
     commands:
-      - git clone https://github.com/a607ernie/Ptt-Stock-Data.git .
+      - git clone https://github.com/a607ernie/Ptt-Stock-Data.git
       - git checkout main
 
   # Step 2: 安裝依賴並執行腳本
