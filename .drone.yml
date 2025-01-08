@@ -6,7 +6,6 @@ steps:
   # Step 1: 拉取代碼
   - name: checkout
     image: alpine/git
-    insecure: true
     environment:
       GIT_USERNAME:
         from_secret: git_username
@@ -14,9 +13,8 @@ steps:
       - echo $GIT_USERNAME
       - echo ${GIT_USERNAME}
       - echo "${GIT_USERNAME}"
+      - echo "$GIT_USERNAME"
       - echo "https://${GIT_USERNAME}:"
-      - echo $git_username
-      - echo ${git_username}
       # - git clone https://github.com/${GIT_USERNAME}/Ptt-Stock-Data.git
       # - git checkout main
 
