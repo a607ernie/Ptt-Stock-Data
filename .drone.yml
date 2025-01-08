@@ -3,31 +3,19 @@ type: docker
 name: default
 
 steps:
-  - name: check-environment
-    image: busybox
-    commands:
-      - env  # 列出所有環境變數
+  # Step 1: 拉取代碼
   - name: check-environment2
     image: busybox
     environment:
       GIT_USERNAME:
         from_secret: git_username
+      GIT_EMAIL:
+        from_secret: git_email
     commands:
       - env  # 列出所有環境變數
-  # Step 1: 拉取代碼
-  - name: checkout
-    image: alpine/git
-    environment:
-      GIT_USERNAME:
-        from_secret: git_username
-    commands:
       - echo ${GIT_USERNAME}
       - echo $GIT_USERNAME
       - echo $${GIT_USERNAME}
-    secrets: [git_username]
-      # - git clone https://github.com/${GIT_USERNAME}/Ptt-Stock-Data.git
-      # - git checkout main
-
   # Step 2: 安裝依賴並執行腳本
   - name: run-script
     image: python:3.10
