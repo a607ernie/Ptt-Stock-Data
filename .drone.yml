@@ -29,6 +29,10 @@ steps:
   - name: push-changes
     image: alpine/git
     environment:
+      GIT_USERNAME:
+        from_secret: git_username
+      GIT_EMAIL:
+        from_secret: git_email
       GIT_ACCESS_TOKEN:
         from_secret: git_access_token
     commands:
