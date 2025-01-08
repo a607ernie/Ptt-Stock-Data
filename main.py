@@ -102,19 +102,19 @@ class Stock(object):
                 neutral += 1
         message_count = push - boo
         data = {
-                'STOCK_ID': item['stock_id'],
-                "TITLE": item['title'],
-                "ID": item['article_id'],
-                "LINK":item['pagelink'],
-                "AUTHOR": item['author'],
-                "CONTENT": content,
-                "TIME": date,
-                "MESSAGE_ALL": message_all,
-                "BOO": boo,
-                "PUSH": push,
-                "MESSAGE_COUNT": message_count,
-                "NEUTRAL": neutral,
-                "TAG":item['content_tag']
+            "STOCK_ID": item['stock_id'],
+            "TITLE": item['title'],
+            "ID": item['article_id'],
+            "LINK": item['pagelink'],
+            "AUTHOR": item['author'],
+            "CONTENT": content,
+            "TIME": date,
+            "MESSAGE_ALL": message_all,
+            "BOO": boo,
+            "PUSH": push,
+            "MESSAGE_COUNT": message_count,
+            "NEUTRAL": neutral,
+            "TAG": item['content_tag']
         }
         payload.append(data)
         return payload
@@ -136,7 +136,16 @@ class Stock(object):
             _item = self.parsepage(item)
             result.append(_item)
 
-        current_page = int(self.upURL.split('index')[1].split('.html')[0])
+        if self.upURL:
+            try:
+                current_page = int(self.upURL.split('index')[1].split('.html')[0])
+            except:
+                print("Error parsing current page number from upURL")
+                return {}
+        else:
+            print("upURL is None. Exiting.")
+            return {}
+
         self.fetch_flag = True
 
         # Multi-thread loop
@@ -158,6 +167,7 @@ class Stock(object):
             res[result[i][0]['TITLE']] = result[i][0]
 
         return res
+
 
 
 
