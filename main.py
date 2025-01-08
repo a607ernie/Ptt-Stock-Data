@@ -21,19 +21,23 @@ class Stock(object):
         self.base_url = "https://www.ptt.cc/"
         self.fetch_flag = False
         self.url = 'https://www.ptt.cc/bbs/Stock/index.html'
+        self.headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        self.cookies = {"over18": "1"} 
         # Step 1: Get the index page and the next page URL
         self.data, self.upURL = self.fetchpage(self.url)
-
+        
     # Request the page and return a BeautifulSoup object
     def fetchpage(self, current_page):
         data = []
         if self.fetch_flag:  # current_page first is a URL, then always a number like 5009...
             url = f'https://www.ptt.cc/bbs/Stock/index{current_page}.html'
             print(url)
-            r = requests.get(url)
+            r = requests.get(url, headers=self.headers,cookies=self.cookies)
         else:
             print(current_page)
-            r = requests.get(current_page)
+            r = requests.get(current_page, headers=self.headers,cookies=self.cookies)
         
         sp = BeautifulSoup(r.text, 'lxml')
         
@@ -75,7 +79,7 @@ class Stock(object):
     # Parse an article and build a payload
     def parsepage(self, item):
         payload = []
-        r = requests.get(item['pagelink'])
+        r = requests.get(item['pagelink'], headers=self.headers,cookies=self.cookies)
         sp = BeautifulSoup(r.text, 'lxml')
 
         content = sp.find('div', {'id': 'main-content'}).text
