@@ -14,7 +14,7 @@ from linebot.models import TextSendMessage
 from linebot.exceptions import LineBotApiError
 
 
-semaphore = threading.Semaphore(30)
+semaphore = threading.Semaphore(10)
 
 class Stock(object):
     def __init__(self):
@@ -26,8 +26,8 @@ class Stock(object):
         
     #上一頁
     def uppage(self,sp):
-        uppage = self.base_url+sp.find("div",{'class':'btn-group btn-group-paging'}).find_all('a')[1]['href']
-        return uppage
+        _uppage = self.base_url+sp.find("div",{'class':'btn-group btn-group-paging'}).find_all('a')[1]['href']
+        return _uppage
 
     #request to the page and return a beautifulsoup object
     def fetchpage(self,current_page):
@@ -174,22 +174,22 @@ dict_headers = {'Content-type': 'application/json'}
 
 # prod .ENV
 # use in github or production
-SLACK_WEBHOOK = os.getenv('SLACK_WEBHOOK')
+# SLACK_WEBHOOK = os.getenv('SLACK_WEBHOOK')
 
-slack_content = {
-	"blocks": [
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "*PTT STOCK* :zap:"
-			}
-		},
-		{
-			"type": "divider"
-		}
-	]
-}
+# slack_content = {
+# 	"blocks": [
+# 		{
+# 			"type": "section",
+# 			"text": {
+# 				"type": "mrkdwn",
+# 				"text": "*PTT STOCK* :zap:"
+# 			}
+# 		},
+# 		{
+# 			"type": "divider"
+# 		}
+# 	]
+# }
 
 
 def slack_notify(data):
@@ -217,8 +217,8 @@ def slack_notify(data):
 
 # prod .ENV
 # use in github or production
-LINE_Channel_ACCESS_TOKEN = os.getenv('LINE_Channel_ACCESS_TOKEN')
-LINE_CHANNEL_ID = os.getenv('LINE_CHANNEL_ID')
+# LINE_Channel_ACCESS_TOKEN = os.getenv('LINE_Channel_ACCESS_TOKEN')
+# LINE_CHANNEL_ID = os.getenv('LINE_CHANNEL_ID')
 
 def line_notify(data):
     line_bot_api = LineBotApi(LINE_Channel_ACCESS_TOKEN)
@@ -252,7 +252,7 @@ if __name__ == '__main__':
     stock = Stock()
 
     # ptt page number
-    page_num=10
+    page_num=5
     result = stock.__main__(page_num)
 
     # .JSON
@@ -261,8 +261,8 @@ if __name__ == '__main__':
         outfile.write(json_object)
     
     # .CSV
-    df = pd.read_json(json_object).T
-    df.to_csv('ptt_stock.csv',encoding='utf-8-sig', index=False)
+    # df = pd.read_json(json_object).T
+    # df.to_csv('ptt_stock.csv',encoding='utf-8-sig', index=False)
 
     #slack_notify(result)
-    line_notify(result)
+    # line_notify(result)
