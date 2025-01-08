@@ -36,8 +36,8 @@ steps:
       GIT_ACCESS_TOKEN:
         from_secret: git_access_token
     commands:
-      - git config --global user.name "${GIT_USERNAME}"
-      - git config --global user.email "${GIT_EMAIL}"
+      - git config --global user.name ${GIT_USERNAME}
+      - git config --global user.email ${GIT_EMAIL}
       - git add .
       - git commit -m "Update stock information from PTT" || echo "No changes to commit"
       - git push https://${GIT_USERNAME}:${GIT_ACCESS_TOKEN}@github.com/${GIT_USERNAME}/Ptt-Stock-Data.git main
