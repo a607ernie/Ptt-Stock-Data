@@ -275,8 +275,8 @@ if __name__ == '__main__':
         outfile.write(json_object)
     
     # .CSV
-    # df = pd.read_json(json_object).T
-    # df.to_csv('ptt_stock.csv',encoding='utf-8-sig', index=False)
+    df = pd.read_json(json_object).T
+    df.to_csv('ptt_stock.csv',encoding='utf-8-sig', index=False)
 
     #slack_notify(result)
     # line_notify(result)
