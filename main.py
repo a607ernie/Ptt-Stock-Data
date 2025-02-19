@@ -12,7 +12,7 @@ import os
 from linebot import LineBotApi
 from linebot.models import TextSendMessage
 from linebot.exceptions import LineBotApiError
-
+from io import StringIO
 
 semaphore = threading.Semaphore(10)
 
@@ -84,7 +84,7 @@ class Stock(object):
 
         content = sp.find('div', {'id': 'main-content'}).text
         try:
-            date = sp.find('span', {'class': 'article-meta-tag'}, text=re.compile('時間')).next.next.text
+            date = sp.find('span', {'class': 'article-meta-tag'}, string=re.compile('時間')).find_next_sibling().text
         except:
             date = None
 
@@ -275,8 +275,8 @@ if __name__ == '__main__':
         outfile.write(json_object)
     
     # .CSV
-    df = pd.read_json(json_object).T
+    df = pd.read_json(StringIO(json_object)).T
     df.to_csv('ptt_stock.csv',encoding='utf-8-sig', index=False)
 
-    #slack_notify(result)
+    # slack_notify(result)
     # line_notify(result)
