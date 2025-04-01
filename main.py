@@ -83,6 +83,13 @@ class Stock(object):
         sp = BeautifulSoup(r.text, 'lxml')
 
         content = sp.find('div', {'id': 'main-content'}).text
+        # if "※ 引述" in content:
+        #     content = content.split("※ 引述")[0]
+
+        if "※ 發信站:" in content:
+            content = content.split("※ 發信站:")[0]
+        
+
         try:
             date = sp.find('span', {'class': 'article-meta-tag'}, string=re.compile('時間')).find_next_sibling().text
         except:
@@ -164,13 +171,32 @@ class Stock(object):
         for i in range(q.qsize()):
             result.append(q.get_nowait())
 
-        # Process the result
-        # Change list to JSON format
-        res = {}
-        for i in range(len(result)):
-            res[result[i][0]['TITLE']] = result[i][0]
+        # Flatten result and prepare for JSON output
+        flat_result = []
+        for res in result:
+            for article in res:
+                flat_result.append({
+                    "STOCK_ID": article["STOCK_ID"],
+                    "TITLE": article["TITLE"],
+                    "ID": article["ID"],
+                    "LINK": article["LINK"],
+                    "AUTHOR": article["AUTHOR"],
+                    "CONTENT": article["CONTENT"],
+                    "TIME": article["TIME"],
+                    "MESSAGE_ALL": article["MESSAGE_ALL"],
+                    "BOO": article["BOO"],
+                    "PUSH": article["PUSH"],
+                    "MESSAGE_COUNT": article["MESSAGE_COUNT"],
+                    "NEUTRAL": article["NEUTRAL"],
+                    "TAG": article["TAG"]
+                })
 
-        return res
+        # Wrap into the main dictionary
+        return {
+            "articles": flat_result
+        }
+
+
 
 
 
